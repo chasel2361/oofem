@@ -8,7 +8,7 @@ from numpy import matrix
 
 class Frame2D:
     """
-    Abstract object of 2D-linear element in X-Y plan.
+    Abstract object of 2D-linear element in X-Y plane.
     
     Parameters
     ----------

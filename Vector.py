@@ -58,6 +58,7 @@ class Vector:
     @property
     def direction(self):
         l = self.length
+        assert l > 0, 'Vector length can\'t be zero!'
         x = self.x/l
         y = self.y/l
         z = self.z/l

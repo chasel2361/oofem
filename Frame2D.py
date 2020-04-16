@@ -5,6 +5,7 @@ from Vector import Vector
 from Node import Node
 from math import isclose
 from numpy import matrix
+from scipy.sparse import dok_matrix
 
 class Frame2D:
     """
@@ -12,11 +13,11 @@ class Frame2D:
     
     Parameters
     ----------
-    id : {element id, int}
-    node1 : {starting node, Node obj}
-    node2 : {ending node, Node obj}
-    section : {section property of element, Section obj}
-    rayleigh : {rayleigh damping property a1, float}
+    id : {Element index, int}
+    node1 : {Starting node, Node obj}
+    node2 : {Ending node, Node obj}
+    section : {Section property of element, Section obj}
+    rayleigh : {Rayleigh damping property a1, float}
 
     Returns
     -------
@@ -75,6 +76,14 @@ class Frame2D:
     def get_internal_force(self, dof_type, pos_type):
         return []
     
+    def get_local_stiffness(self):
+        return []
+
+    def get_global_stiffness(self, pos_type):
+        k = self.get_local_stiffness()
+        self.transform_to_global(k, pos_type)
+        return k
+
     def dof(self, index):
         return self._dofs[index]
 
@@ -121,29 +130,27 @@ class Frame2D:
         y = axial_vector.y
         l = axial_vector.length
         c, s = x/l, y/l
-        k = matrix(stiffness)
+        
+        k = stiffness
 
-        T = matrix([
-            [c,   s,   0.0, 0.0, 0.0, 0.0],
-            [-s,  c,   0.0, 0.0, 0.0, 0.0],
-            [0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
-            [0.0, 0.0, 0.0, c,   s,   0.0],
-            [0.0, 0.0, 0.0, -s,  c,   0.0],
-            [0.0, 0.0, 0.0, 0.0, 0.0, 1.0]
-        ])
+        T = dok_matrix((6, 6))
+        T[0, 0], T[1, 1], T[3, 3], T[4, 4] = c, c, c, c
+        T[2, 2], T[5, 5] = 1, 1
+        T[0, 1], T[3, 4] = s, s
+        T[1, 0], T[4, 3] = -s, -s
 
         K = T.T*k*T
         for i in range(6):
             for j in range(6):
-                stiffness[i][j] = K[i,j]
+                stiffness[i, j] = K[i, j]
     
     def _get_axial_vector(self, pos_type):
         return Vector(getattr(self.node1, pos_type), getattr(self.node2, pos_type))
 
-    def _get_elongation(self, pos_type):
-        l0 = self.length_origin
-        l = self.get_length(pos_type)
-        return (l**2 - l0**2)/(l + l0)
+    # def _get_elongation(self, pos_type):
+    #     l0 = self.length_origin
+    #     l = self.get_length(pos_type)
+    #     return (l**2 - l0**2)/(l + l0)
     
     def assemble_force(self, dof_type, pos_type, force):
         local_force = self.get_internal_force(dof_type, pos_type)

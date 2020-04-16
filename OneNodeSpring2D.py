@@ -9,11 +9,11 @@ class OneNodeSpring2D():
 
     Parameters
     ----------
-    id : {element id, int}
-    node1 : {node to place spring, Node obj}
-    material : {spring material, Material obj}
-    mass : {spring mass, float}
-    inertia : {spring inertia, float}
+    id : {Element id, int}
+    node1 : {Node to place spring, Node obj}
+    material : {Spring material, Material obj}
+    mass : {Spring mass, float}
+    inertia : {Spring inertia, float}
 
     Returns
     -------
@@ -59,9 +59,12 @@ class OneNodeSpring2D():
     
     @property
     def lumped_mass(self):
-        m = self.mass/2
+        mass = dok_matrix((3, 1))
+        m = self.mass
         i = self.inertia
-        return [m, m, i]
+        mass[0, 0], mass[1, 0] = m, m
+        mass[2, 0] = i
+        return mass
 
     def dof(self, index):
         return self._dofs[index]
@@ -73,11 +76,6 @@ class OneNodeSpring2D():
     
     def assemble_damp_force(self, dof_type, pos_type, force):
         return
-    
-    def assemble_diagonal_stiffness(self, pos_type, stiffness):
-        local_stiffness = self.get_diagonal_stiffness(pos_type)
-        for i, dof in enumerate(self.dofs):
-            dof.assemble_force(stiffness, local_stiffness[i])
     
     def get_internal_force(self, dof_type, pos_type):
         dofs = dok_matrix((3, 1))

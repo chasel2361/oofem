@@ -11,11 +11,20 @@ class TwoNodeSpring2DTest(unittest.TestCase):
         n1 = Node(1, Point())
         n2 = Node(2, Point(1.0, 1.0, 1.0))
         material = LinearMaterial(1, 10)
-        self.spring = TwoNodeSpring2D(1, n1, n2, material, 0, 0)
+        self.spring = TwoNodeSpring2D(1, n1, n2, material, 1, 2)
     
     def tearDown(self):
         self.spring = None
     
+    def test_lumped_mass(self):
+        true = self.assertTrue
+        sp = self.spring
+
+        q = sp.lumped_mass
+        a = [1, 1, 2, 1, 1, 2]
+        for i in range(6):
+            true(isclose(q[i, 0], a[i]))
+
     def test_length(self):
         sp = self.spring
         dofs1 = sp.node1.dofs

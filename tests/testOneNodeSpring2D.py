@@ -4,15 +4,33 @@ import unittest
 
 from OneNodeSpring2D import OneNodeAxialSpring2D, OneNodeShearSpring2D, OneNodeRotationSpring2D
 from Node import Node, Point
-from Material import Material
+from Material import LinearMaterial
 from math import isclose
 from numpy import array
+
+class OneNodeSpring2DTest(unittest.TestCase):
+    def setUp(self):
+        n = Node(1, Point())
+        m = LinearMaterial(1, 10)
+        self.spring = OneNodeAxialSpring2D(1, n, m, 1,2)
+    
+    def tearDown(self):
+        self.spring = None
+    
+    def test_lumped_mass(self):
+        sp = self.spring
+        true = self.assertTrue
+
+        q = sp.lumped_mass
+        a = [1, 1, 2]
+        for i in range(3):
+            true(isclose(q[i, 0], a[i]))
 
 class OneNodeAxialSpring2DTest(unittest.TestCase):
     def setUp(self):
         n = Node(1, Point())
-        m = Material(1, 10, 10, 100)
-        self.spring = OneNodeAxialSpring2D(1, n, m, 0, 0)
+        m = LinearMaterial(1, 10)
+        self.spring = OneNodeAxialSpring2D(1, n, m, 1,2)
     
     def tearDown(self):
         self.spring = None
@@ -49,7 +67,7 @@ class OneNodeAxialSpring2DTest(unittest.TestCase):
 class OneNodeShearSpring2DTest(unittest.TestCase):
     def setUp(self):
         n = Node(1, Point())
-        m = Material(1, 10, 10, 100)
+        m = LinearMaterial(1, 10)
         self.spring = OneNodeShearSpring2D(1, n, m, 0, 0)
     
     def tearDown(self):
@@ -87,7 +105,7 @@ class OneNodeShearSpring2DTest(unittest.TestCase):
 class OneNodeRotationSpring2DTest(unittest.TestCase):
     def setUp(self):
         n = Node(1, Point())
-        m = Material(1, 10, 10, 100)
+        m = LinearMaterial(1, 10)
         self.spring = OneNodeRotationSpring2D(1, n, m, 0, 0)
     
     def tearDown(self):

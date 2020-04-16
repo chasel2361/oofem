@@ -38,9 +38,12 @@ class TwoNodeSpring2D(OneNodeSpring2D):
     
     @property
     def lumped_mass(self):
+        mass = dok_matrix((6, 1))
         m = self.mass
         i = self.inertia
-        return [m, m, i, m, m, i]
+        mass[0, 0], mass[1, 0], mass[3, 0], mass[4, 0] = m, m, m, m
+        mass[2, 0], mass[5, 0] =  i, i
+        return mass
     
     def get_length(self, pos_type):
         return self._get_axial_vector(pos_type).length

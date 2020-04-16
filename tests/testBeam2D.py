@@ -21,12 +21,9 @@ class Beam2DTest(unittest.TestCase):
         true = self.assertTrue
         lumped = self.beam.lumped_mass
 
-        true(isclose(lumped[0], 0.5))
-        true(isclose(lumped[1], 0.5))
-        true(isclose(lumped[2], 5))
-        true(isclose(lumped[3], 0.5))
-        true(isclose(lumped[4], 0.5))
-        true(isclose(lumped[5], 5))
+        a = [0.5, 0.5, 5, 0.5, 0.5, 5]
+        for i in range(6):
+            true(lumped[i, 0], a[i])
     
     def test_get_internal_force(self):
         true = self.assertTrue

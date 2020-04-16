@@ -139,7 +139,7 @@ class Frame2D:
         T[0, 1], T[3, 4] = s, s
         T[1, 0], T[4, 3] = -s, -s
 
-        K = T.T*k*T
+        K = T.T * k * T
         for i in range(6):
             for j in range(6):
                 stiffness[i, j] = K[i, j]

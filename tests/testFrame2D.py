@@ -5,6 +5,7 @@ import unittest
 from Frame2D import Frame2D, Node, Point
 from Section import Section
 from math import isclose, pi
+from numpy import array
 
 class Frame2DTest(unittest.TestCase):
     def setUp(self):
@@ -33,23 +34,6 @@ class Frame2DTest(unittest.TestCase):
         true(isclose(frame.get_length('pos_last'), 8**0.5))
         true(isclose(frame.get_length('pos_try'), 18**0.5))
         true(isclose(frame.get_length('pos_try_last'), 10**0.5))
-    
-    def test_elongation(self):
-        frame = self.frame
-        dofs1 = frame.node1.dofs
-        dofs2 = frame.node2.dofs
-        true = self.assertTrue
-
-        dofs1[0].d = dofs1[1].d = 1
-        dofs1[0].d_last = dofs1[1].d_last = -1
-        dofs2[0].d_try = dofs2[1].d_try = 2
-        dofs2[0].d_try_last = 2
-        dofs2[1].d_try_last = -2
-
-        true(isclose(frame._get_elongation('pos'), -2**0.5))
-        true(isclose(frame._get_elongation('pos_last'), 2**0.5))
-        true(isclose(frame._get_elongation('pos_try'), 8**0.5))
-        true(isclose(frame._get_elongation('pos_try_last'), 10**0.5 - 2**0.5))
 
     def test_get_axial_vector(self):
         frame = self.frame
@@ -124,14 +108,14 @@ class Frame2DTest(unittest.TestCase):
         frame = Frame2D(1, n1, n2, 0, 0)
         true = self.assertTrue
 
-        question = [
+        question = array([
             [2000,  0,      0,      -2000,  0,      0],
             [0,     12,     -6,     0,      -12,    -6],
             [0,     -6,     4,      0,      6,      2],
             [-2000, 0,      0,      2000,   0,      0],
             [0,     -12,    6,      0,      12,     6],
             [0,     -6,     2,      0,      6,      4]
-        ]
+        ], dtype = float)
         frame.transform_to_global(question, 'pos_origin')
 
         answer = [

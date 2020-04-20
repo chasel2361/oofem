@@ -1,10 +1,10 @@
 import unittest
 
-from TwoNodeSpring2D import *
+from TwoNodeSpring2D import TwoNodeSpring2D, TwoNodeAxialSpring2D, TwoNodeShearSpring2D, TwoNodeRotationSpring2D
 from Node import Node, Point
 from Material import LinearMaterial
 from math import isclose
-from numpy import array
+from numpy import array, zeros
 
 class TwoNodeSpring2DTest(unittest.TestCase):
     def setUp(self):
@@ -116,6 +116,18 @@ class TwoNodeAxialSpring2DTest(unittest.TestCase):
     def tearDown(self):
         self.spring = None
     
+    def test_get_local_stiffness(self):
+        true = self.assertTrue
+
+        q = self.spring.get_local_stiffness()
+        a = zeros((6, 6))
+        a[0, 0], a[3, 3] = 10.0, 10.0
+        a[0, 3], a[3, 0] = -10.0, -10.0
+
+        for i in range(6):
+            for j in range(6):
+                true(isclose(q[i, j], a[i, j]))
+
     def test_get_internal_force(self):
         sp = self.spring
         true = self.assertTrue
@@ -166,10 +178,25 @@ class TwoNodeShearSpring2DTest(unittest.TestCase):
         n1 = Node(1, Point(0, 1, 0))
         n2 = Node(2, Point())
         material = LinearMaterial(1, 10)
-        self.spring = TwoNodeShearSpring2D(1, n1, n2, material, 0, 0.5)
+        self.spring = TwoNodeShearSpring2D(1, n1, n2, material, 0, 0, 0.5)
     
     def tearDown(self):
         self.spring = None
+
+    def test_get_local_stiffness(self):
+        true = self.assertTrue
+
+        q = self.spring.get_local_stiffness()
+        a = zeros((6, 6))
+        a[1, 1], a[4, 4] = 10.0, 10.0
+        a[1, 4], a[4, 1] = -10.0, -10.0
+        a[1, 2], a[2, 1], a[1, 5], a[5, 1] = 5, 5, 5, 5
+        a[2, 4], a[4, 2], a[4, 5], a[5, 4] = -5, -5, -5, -5
+        a[2, 5], a[5, 2], a[2, 2], a[5, 5] = 2.5, 2.5, 2.5, 2.5
+
+        for i in range(6):
+            for j in range(6):
+                true(isclose(q[i, j], a[i, j]))
     
     def test_get_internal_force(self):
         sp = self.spring
@@ -185,45 +212,19 @@ class TwoNodeShearSpring2DTest(unittest.TestCase):
         dofs[1].d_try = 7
         dofs[4].d_try = -7
         q = sp.get_internal_force('d_try', '')
-        a = array([[15.0], [0.0], [15.0], [-15.0], [0.0], [0.0]])
+        a = array([[15.0], [0.0], [7.5], [-15.0], [0.0], [7.5]])
         for i in range(6):
             true(isclose(q[i, 0], a[i, 0]))
         
         dofs[3].d_try = -3.2
         q = sp.get_internal_force('d_try', '')
-        a = array([[47.0], [0.0], [47.0], [-47.0], [0.0], [0.0]])
+        a = array([[47.0], [0.0], [23.5], [-47.0], [0.0], [23.5]])
         for i in range(6):
             true(isclose(q[i, 0], a[i, 0]))
         
-        dofs[11].d_try = -3.2
+        dofs[5].d_try = -1
         q = sp.get_internal_force('d_try', '')
-        a = array([[47.0], [0.0], [15.0], [-47.0], [0.0], [0.0]])
-        for i in range(6):
-            true(isclose(q[i, 0], a[i, 0]))
-        
-        dofs[0].d_try = -2.6
-        question = sp.get_internal_force('d_try', '')
-        answer = [6.0, 0.0, 0.0, 0.0, -6.0, 0.0, -6.0, 0.0, 0.0, 0.0, 0.0]
-        for i in range(6):
-            true(isclose(q[i, 0], a[i, 0]))
-        
-        dofs[0].d_try = 0
-        dofs[6].d_try = 0.9
-        question = sp.get_internal_force('d_try', '')
-        answer = [23.0, 0.0, 0.0, 0.0, -23.0, 0.0, -23.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-        for i in range(6):
-            true(isclose(q[i, 0], a[i, 0]))
-        
-        dofs[0].d_try = -1.3
-        question = sp.get_internal_force('d_try', '')
-        answer = [10.0, 0.0, 0.0, 0.0, -10.0, 0.0, -10.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-        for i in range(6):
-            true(isclose(q[i, 0], a[i, 0]))
-        
-        dofs[4].d_try = 0.0
-        dofs[10].d_try = 0.0
-        question = sp.get_internal_force('d_try', '')
-        answer = [-22.0, 0.0, 0.0, 0.0, 22.0, 0.0, 22.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        a = array([[42.0], [0.0], [21.0], [-42.0], [0.0], [21.0]])
         for i in range(6):
             true(isclose(q[i, 0], a[i, 0]))
 
@@ -237,6 +238,18 @@ class TwoNodeRotationSpring2DTest(unittest.TestCase):
     
     def tearDown(self):
         self.spring = None
+    
+    def test_get_local_stiffness(self):
+        true = self.assertTrue
+
+        q = self.spring.get_local_stiffness()
+        a = zeros((6, 6))
+        a[2, 2], a[5, 5] = 10, 10
+        a[2, 5], a[5, 2] = -10, -10
+
+        for i in range(6):
+            for j in range(6):
+                true(isclose(q[i, j], a[i, j]))
     
     def test_get_internal_force(self):
         sp = self.spring

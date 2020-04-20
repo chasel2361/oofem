@@ -170,25 +170,28 @@ class TwoNodeShearSpring2D(TwoNodeSpring2D):
         return self._shear_location_ratio
     
     def get_local_stiffness(self):
-        k = dok_matrix((6, 6))
-        stiffness = self.stiffness
+        stiffness = dok_matrix((6, 6))
+        k = self.stiffness
         l0 = self.length_origin
         ls = self.shear_location_ratio * l0
         l0s = l0 - ls
 
-        A2 = stiffness*l0s
-        A3 = stiffness*ls
-        A4 = stiffness*l0s**2
-        A5 = stiffness*ls*l0s
-        k[1, 1], k[4, 4] = stiffness, stiffness
-        k[1, 4], k[4, 1] = -stiffness, -stiffness
-        k[1, 2], k[2, 1] = A2, A2
-        k[1, 4], k[4, 1] = -A2, -A2
-        k[1 ,5], k[5, 1] = A3, A3
-        k[4, 5], k[5, 4] = -A3, -A3
-        k[2, 2], k[5, 5] = A4, A4
-        k[2, 5], k[5, 2] = A5, A5
-        return k
+        A1 = k
+        A2 = l0s * k
+        A3 = ls * k
+        A4 = ls * l0s * k
+        A5 = l0s**2 * k
+        A6 = ls**2 * k
+        stiffness[1, 1], stiffness[4, 4] = A1, A1
+        stiffness[1, 4], stiffness[4, 1]= -A1, -A1
+        stiffness[1, 2], stiffness[2, 1] = A2, A2
+        stiffness[2, 4], stiffness[4, 2] = -A2, -A2
+        stiffness[1, 5], stiffness[5, 1] = A3, A3
+        stiffness[4, 5], stiffness[5, 4] = -A3, -A3
+        stiffness[2, 5], stiffness[5, 2] = A4, A4
+        stiffness[2, 2] = A5
+        stiffness[5, 5] = A6
+        return stiffness
 
 
 class TwoNodeRotationSpring2D(TwoNodeSpring2D):

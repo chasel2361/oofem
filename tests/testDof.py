@@ -1,6 +1,7 @@
 import unittest
 from Dof import ActiveDof, BoundaryDof
 from math import isclose
+from numpy import array
 
 class ActiveDofTest(unittest.TestCase):
     def setUp(self):
@@ -21,7 +22,7 @@ class ActiveDofTest(unittest.TestCase):
     def test_inc_d_try(self):
         true = self.assertTrue
         dof = self.dof
-        delta_d = [0, -1]
+        delta_d = array([[0], [-1]])
 
         dof.inc_d_try(delta_d)
         true(isclose(dof.d_try_last, 3))
@@ -40,10 +41,10 @@ class ActiveDofTest(unittest.TestCase):
     def test_assemble_force(self):
         true = self.assertTrue
         dof = self.dof
-        force = [0, 1, 2, 3, 4]
+        force = array([[0], [1], [2], [3], [4]])
 
         dof.assemble_force(force, 10)
-        answer = [0, 11, 2, 3, 4]
-        for a, q in zip(answer, force):
-            true(isclose(a, q))
+        answer = array([[0], [11], [2], [3], [4]])
+        for i in range(5):
+            true(isclose(answer[i, 0], force[i, 0]))
     

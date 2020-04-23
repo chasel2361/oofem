@@ -114,7 +114,7 @@ class ActiveDof:
         
     def inc_d_try(self, delta_d):
         self.d_try_last = self.d_try
-        self.d_try += delta_d[self.eq_number]
+        self.d_try += delta_d[self.eq_number, 0]
     
     def commit(self):
         self.d_last = self.d
@@ -127,10 +127,10 @@ class ActiveDof:
         
     def assemble_force(self, force, value):
         if self.eq_number != None:
-            force[self.eq_number] += value
+            force[self.eq_number, 0] += value
     
     def _get_dof(self, dof, d_type):
-        dof[self.eq_number] = getattr(self, d_type)
+        dof[self.eq_number, 0] = getattr(self, d_type)
 
         
     def __repr__(self):

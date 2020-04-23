@@ -493,29 +493,26 @@ class TwoNodeModifiedCloughSpring2D(TwoNodeSpring2D):
     
 
 class TwoNodeModifiedCloughAxialSpring2D(TwoNodeModifiedCloughSpring2D):
-    def __init__(self, id, node1, node2, material, mass, inertia, ref_x, ref_y, ref_z, shear_location_ratio = 0.0):
-        super().__init__(id, node1, node2, material, mass, inertia, ref_x, ref_y, ref_z)
     
     def set_try_disp(self):
         dofs = [getattr(dof, 'd_try') for dof in self.dofs]
         self.orient_to_local(dofs, 'pos_try')
-        elongation = dofs[6] - dofs[0]
+        elongation = dofs[3] - dofs[0]
 
         stage_index = self.stage_index
         self.stage[stage_index](elongation)
     
     def get_internal_force(self, dof_type, pos_type):
-        dofs = [getattr(dof, dof_type) for dof in self.dofs]
-        self.orient_to_local(dofs, pos_type)
-
-        force = self.dict_force[dof_type]
-        f_1_a = -force
-        f_1_b = force
-        force = [f_1_a, 0.0, 0.0, 0.0, 0.0, 0.0, f_1_b, 0.0, 0.0, 0.0, 0.0, 0.0]
-        self.orient_to_global(force, pos_type)
+        force = dok_matrix((6, 1))
+        P = self.dict_force[dof_type]
+        inf = [-P, 0.0, 0.0, P, 0.0, 0.0]
+        self.orient_to_global(inf, pos_type)
+        for i, f in enumerate(inf):
+            force[i, 0] = f
         return force
     
-    def get_global_stiffness(self):
+    def get_local_stiffness(self):        
+        stiffness = dok_matrix((6, 6))
         index = self.stage_index
         if index == 1 or index == 3 or index == 5:
             k = self.elastic_stiffness
@@ -523,21 +520,21 @@ class TwoNodeModifiedCloughAxialSpring2D(TwoNodeModifiedCloughSpring2D):
             k = self.post_yield_stiffness
         if self.stage_index == 4:
             k = self.get_reloading_stiffness(self.phase)
-        return [
-            [k  , 0.0, 0.0, -k , 0.0, 0.0],
-            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-            [-k , 0.0, 0.0, k  , 0.0, 0.0],
-            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-        ]
+        stiffness[0, 0], stiffness[3, 3] = k, k
+        stiffness[0, 3], stiffness[3, 0] = -k, -k
+        return stiffness
 
 
 ###跑出來的圖有點怪怪，可能是shear_disp的關係
 class TwoNodeModifiedCloughShearSpring2D(TwoNodeModifiedCloughSpring2D):
-    def __init__(self, id, node1, node2, material, mass, inertia, ref_x, ref_y, ref_z, shear_location_ratio = 0.0):
-        super().__init__(id, node1, node2, material, mass, inertia, ref_x, ref_y, ref_z)
-    
+    def __init__(self, id, node1, node2, material, mass, inertia, shear_location_ratio = 0.0):
+        super().__init__(id, node1, node2, material, mass, inertia)
+        self._shear_location_ratio = shear_location_ratio
+
+    @property
+    def shear_location_ratio(self):
+        return self._shear_location_ratio
+
     def set_try_disp(self):
         l0 = self.length_origin
         shear_location = self.shear_location_ratio * l0
@@ -592,7 +589,7 @@ class TwoNodeModifiedCloughRotationSpring2D(TwoNodeModifiedCloughSpring2D):
     def set_try_disp(self):
         dofs = [getattr(dof, 'd_try') for dof in self.dofs]
         self.orient_to_local(dofs, 'pos_try')
-        disp = dofs[5] - dofs[0]
+        disp = dofs[5] - dofs[2]
 
         stage_index = self.try_stage_index
         self.stage[stage_index](disp)

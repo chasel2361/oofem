@@ -1,5 +1,5 @@
 import unittest
-from TwoNodeModifiedCloughSpring2D import *
+from TwoNodeModifiedCloughSpring2D import TwoNodeModifiedCloughSpring2D, TwoNodeModifiedCloughAxialSpring2D, TwoNodeModifiedCloughShearSpring2D, TwoNodeModifiedCloughRotationSpring2D
 from Material import BilinearMaterial
 from Node import Node, Point
 from math import isclose

@@ -3,6 +3,7 @@ import random
 from Node import Node, BoundaryDof, ActiveDof, Point
 from Integrator import Newmark
 from math import isclose
+from numpy import array
 
 class NodeTest(unittest.TestCase):
     def setUp(self):
@@ -69,7 +70,7 @@ class NodeTest(unittest.TestCase):
         
 
     def test_inc_d_try(self):
-        d = [2, 3, 4, 5, 6, 7]
+        d = array([[2], [3], [4], [5], [6], [7]])
         n = self.node
         Equal = self.assertEqual
         dofs = n.dofs

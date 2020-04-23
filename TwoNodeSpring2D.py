@@ -128,7 +128,23 @@ class TwoNodeSpring2D(OneNodeSpring2D):
     
 
 class TwoNodeAxialSpring2D(TwoNodeSpring2D):
-    
+    """
+    Two node axial spring element object in X-Y plane.
+
+    Parameters
+    ----------
+    id : {Element index, int}
+    node1 : {Starting Node, Node obj}
+    node2 : {Ending Node, Node obj}
+    material : {Spring material, Material obj}
+    mass : {Spring mass, float}
+    inertia : {Spring inertia, float}
+
+    Returns
+    -------
+    out : TwoNodeAxialSpring obj
+
+    """    
     def get_local_stiffness(self):
         k = dok_matrix((6, 6))
         stiffness = self.stiffness
@@ -137,12 +153,7 @@ class TwoNodeAxialSpring2D(TwoNodeSpring2D):
         return k
         
 
-class TwoNodeShearSpring2D(TwoNodeSpring2D):    
-    """
-    stiffness need to be fixed
-    """
-    
-    
+class TwoNodeShearSpring2D(TwoNodeSpring2D):
     """
     Two node shear spring element object in X-Y plane.
 
@@ -158,7 +169,7 @@ class TwoNodeShearSpring2D(TwoNodeSpring2D):
 
     Returns
     -------
-    out : TwoNodeAxialSpring obj
+    out : TwoNodeShearSpring obj
     
     """
     def __init__(self, id, node1, node2, material, mass, inertia, loc_ratio = 0.0):
@@ -195,6 +206,23 @@ class TwoNodeShearSpring2D(TwoNodeSpring2D):
 
 
 class TwoNodeRotationSpring2D(TwoNodeSpring2D):
+    """
+    Two node rotation spring element object in X-Y plane.
+
+    Parameters
+    ----------
+    id : {Element index, int}
+    node1 : {Starting Node, Node obj}
+    node2 : {Ending Node, Node obj}
+    material : {Spring material, Material obj}
+    mass : {Spring mass, float}
+    inertia : {Spring inertia, float}
+
+    Returns
+    -------
+    out : TwoNodeRotationSpring obj
+
+    """
 
     def get_local_stiffness(self):
         k = dok_matrix((6, 6))

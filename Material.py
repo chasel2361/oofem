@@ -93,7 +93,7 @@ class BilinearMaterial(LinearMaterial):
                 f'k2 = {self.inelastic_stiffness:11.5e}; '
                 f'uy = {self.yield_disp:6.3f}')
 
-class DegradingStrengthMaterial(LinearMaterial):
+class DegradingStrengthMaterial(BilinearMaterial):
     """
     Material object which will degradie strength.
 

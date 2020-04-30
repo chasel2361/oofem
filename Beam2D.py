@@ -28,12 +28,12 @@ class Beam2D(Frame2D):
     
     @property
     def lumped_mass(self):
-        m = dok_matrix((6, 1))
+        m = dok_matrix((6, 6))
         section = self.section
         mass = self.length_origin * section.l_density / 2
         inertia = mass * section.I_z / section.Area
-        m[0, 0], m[1, 0], m[3, 0], m[4, 0] = mass, mass, mass, mass
-        m[2, 0], m[5, 0] = inertia, inertia
+        m[0, 0], m[1, 1], m[3, 3], m[4, 4] = mass, mass, mass, mass
+        m[2, 2], m[5, 5] = inertia, inertia
         return m
     
     def get_internal_force(self, dof_type, pos_type):

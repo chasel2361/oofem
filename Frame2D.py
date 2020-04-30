@@ -74,10 +74,13 @@ class Frame2D:
         return self.get_length('pos_origin')
     
     def get_internal_force(self, dof_type, pos_type):
-        return []
+        return dok_matrix((1, 1))
     
+    def get_damp_force(self, dof_type, pos_type):
+        return dok_matrix((1, 1))
+
     def get_local_stiffness(self):
-        return []
+        return dok_matrix((1, 1))
 
     def get_global_stiffness(self, pos_type):
         k = self.get_local_stiffness()
@@ -155,7 +158,12 @@ class Frame2D:
     def assemble_force(self, dof_type, pos_type, force):
         local_force = self.get_internal_force(dof_type, pos_type)
         for i, dof in enumerate(self.dofs):
-            dof.assemble_force(force, local_force[i])
+            dof.assemble_force(force, local_force[i, 0])
+    
+    def assemble_damp_force(self, dof_type, pos_type, force):
+        local_force = self.get_damp_force(dof_type, pos_type)
+        for i, dof in enumerate(self.dofs):
+            dof.assemble_force(force, local_force[i, 0])
 
 
     def __repr__(self):
